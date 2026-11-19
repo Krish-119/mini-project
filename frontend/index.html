@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTTP Proxy Server with Caching</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">
+                <h1>Proxy&nbsp;Cache</h1>
+                <p>v1.0.0</p>
+            </div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-tab="dashboard"><button class="nav-btn"><span class="nav-icon">📊</span>Dashboard</button></li>
+            <li class="nav-item" data-tab="browser"><button class="nav-btn"><span class="nav-icon">🌐</span>Mini‑Browser</button></li>
+            <li class="nav-item" data-tab="cache"><button class="nav-btn"><span class="nav-icon">🗄️</span>Cache&nbsp;Analytics</button></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="cluster-pill">
+                <span>Node:</span> <strong id="node-id">node-1</strong>
+                <span class="status-dot" title="healthy"></span>
+            </div>
+            <button class="btn-outline" id="theme-toggle">Toggle Light/Dark</button>
+        </div>
+    </aside>
+
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-title">
+                <h2 id="page-title">Dashboard</h2>
+            </div>
+            <div class="topbar-actions">
+                <div class="refresh-control">
+                    <button class="btn-icon" id="refresh-btn">⟳ Refresh</button>
+                </div>
+            </div>
+        </header>
+        <section class="content-body">
+            <!-- Dashboard Tab -->
+            <div class="tab-content active" id="dashboard-tab">
+                <div class="metrics-grid" id="metrics-grid"></div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header"><h3>Cache HIT vs MISS</h3></div>
+                        <canvas id="hitMissChart" class="chart-container"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header"><h3>Response Time (ms)</h3></div>
+                        <canvas id="responseTimeChart" class="chart-container"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header"><h3>Throughput (req/s)</h3></div>
+                        <canvas id="throughputChart" class="chart-container"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header"><h3>Cache Memory Usage (MB)</h3></div>
+                        <canvas id="memoryChart" class="chart-container"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini‑Browser Tab -->
+            <div class="tab-content" id="browser-tab">
+                <div class="browser-panel">
+                    <div class="browser-header">
+                        <div class="browser-bar">
+                            <select class="method-select" id="method-select">
+                                <option>GET</option>
+                                <option>HEAD</option>
+                            </select>
+                            <input type="text" class="url-input" id="url-input" placeholder="Enter URL (e.g. http://example.com)" />
+                            <button class="btn-primary" id="go-btn">▶ Go</button>
+                        </div>
+                        <div class="preset-pills">
+                            <span>Presets:</span>
+                            <span class="preset-pill" data-url="http://localhost:9000/fast">Fast</span>
+                            <span class="preset-pill" data-url="http://localhost:9000/slow">Slow</span>
+                            <span class="preset-pill" data-url="http://localhost:9000/revalidate">Revalidate</span>
+                            <span class="preset-pill" data-url="http://localhost:9000/short-ttl">Short‑TTL</span>
+                        </div>
+                        <div class="browser-badges" id="browser-badges"></div>
+                    </div>
+                    <div class="browser-tabs" id="browser-tabs">
+                        <button class="browser-tab active" data-view="preview">Preview</button>
+                        <button class="browser-tab" data-view="raw">Raw&nbsp;View</button>
+                        <button class="browser-tab" data-view="headers">Headers</button>
+                    </div>
+                    <div class="browser-tab-content" id="preview-view">
+                        <iframe class="preview-frame" id="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+                    </div>
+                    <div class="browser-tab-content" id="raw-view" style="display:none;">
+                        <pre class="raw-view" id="raw-response"></pre>
+                    </div>
+                    <div class="browser-tab-content" id="headers-view" style="display:none;">
+                        <table class="data-table" id="headers-table">
+                            <thead><tr><th>Header</th><th>Value</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cache Analytics Tab -->
+            <div class="tab-content" id="cache-tab">
+                <div class="management-toolbar">
+                    <div class="policy-badge" id="policy-badge">Policy: LRU</div>
+                    <button class="btn-outline" id="clear-cache-btn">Clear Cache</button>
+                    <select class="method-select" id="policy-select">
+                        <option value="LRU" selected>LRU</option>
+                        <option value="LFU">LFU</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table" id="cache-table">
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>Status</th>
+                                <th>Age (s)</th>
+                                <th>TTL (s)</th>
+                                <th>Size (KB)</th>
+                                <th>Hits</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

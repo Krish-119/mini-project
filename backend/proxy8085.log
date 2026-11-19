@@ -1,0 +1,8 @@
+==================================================
+  HTTP Proxy Server with Caching [Node: node-1]
+  Listening on: 0.0.0.0:8085
+  Worker Threads: 8 | Queue Capacity: 100
+  Cache: ENABLED (LRU) | Memory Limit: 64 MB
+  Monitoring Dashboard: http://localhost:8085/
+==================================================
+[OriginClient] Connection failed to localhost:9000
